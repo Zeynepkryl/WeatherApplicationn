@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        app:icon="@drawable/update"
+        app:title="Update">
+
+
+        <ListPreference
+            app:entries="@array/update_entries"
+            app:entryValues="@array/update_values"
+            app:key="update"
+            app:title="Choose an update time"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+</PreferenceScreen>
