@@ -107,16 +107,16 @@
         android:id="@+id/settingsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="14dp"
+        android:layout_marginTop="23dp"
+        android:layout_marginEnd="23dp"
         android:background="@drawable/ic_settings"
         android:backgroundTint="@color/black"
         android:clickable="true"
+        android:focusable="true"
         app:borderWidth="4dp"
         app:fabSize="mini"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:focusable="true" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/todayTextCard"
