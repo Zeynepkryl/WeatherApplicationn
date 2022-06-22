@@ -1,12 +1,16 @@
 package com.lesson.weatherapplication.service;
 
+import static com.lesson.weatherapplication.constans.Constans.BASE_URL;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,6 +19,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,18 +27,35 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.lesson.weatherapplication.R;
+import com.lesson.weatherapplication.constans.Constans;
 import com.lesson.weatherapplication.constans.WidgetConstans;
+import com.lesson.weatherapplication.data.WeatherAPI;
+import com.lesson.weatherapplication.model.Weather;
+import com.lesson.weatherapplication.model.WeatherModel;
+import com.lesson.weatherapplication.util.PreferencesConstants;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MyLocationService extends Service {
     String cityName;
+    private static Retrofit retrofit;
     private final IBinder binder = new LocalBinder();
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -47,6 +69,9 @@ public class MyLocationService extends Service {
 
                 cityName = getCityName(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
                 System.out.println("Current:" + cityName);
+                //dataRequest(views, appWidgetManager, context, appWidgetId, getCityNameFromPreferences(context));
+
+
 
             }
         }
@@ -148,6 +173,55 @@ public class MyLocationService extends Service {
             e.printStackTrace();
         }
         return cityName;
+    }
+
+    private void dataRequest(RemoteViews views, AppWidgetManager appWidgetManager, Context context, int appWidgetId, String cityName) {
+        if (retrofit == null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+            httpClient.addInterceptor(logging);
+
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build())
+                    .build();
+        }
+        WeatherAPI service = retrofit.create(WeatherAPI.class);
+        Call<WeatherModel> weatherCall = service.getWeather(cityName, Constans.API_KEY, Constans.METRIC);
+        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetId);
+        weatherCall.enqueue(new Callback<WeatherModel>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    Weather todayWeather = response.body().getTodayWeather();
+                    views.setTextViewText(R.id.widgetDescription, response.body().getWeather().get(0).getDescription());
+                    views.setTextViewText(R.id.widgetminTemp, ((int) response.body().getMain().getTempMin().doubleValue() + "°"));
+                    views.setTextViewText(R.id.widgetmaxTemp, ((int) response.body().getMain().getTempMax().doubleValue() + "°"));
+                    views.setTextViewText(R.id.widgetTemp, ((int) response.body().getMain().getTemp().doubleValue() + "°"));
+                    views.setTextViewText(R.id.widgetcityText, response.body().getName());
+
+                    Glide.with(context.getApplicationContext())
+                            .asBitmap()
+                            .load(todayWeather.getIconUrl())
+                            .into(weatherIcon);
+                }
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<WeatherModel> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    private String getCityNameFromPreferences(Context context) {
+        String defaultCityName = "Ankara";
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PreferencesConstants.PREFERENCES_NAME, MODE_PRIVATE);
+        return sharedPreferences.getString(PreferencesConstants.CITY_NAME, defaultCityName);
     }
 
     public class LocalBinder extends Binder {
