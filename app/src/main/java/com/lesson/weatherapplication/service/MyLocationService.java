@@ -108,6 +108,7 @@ public class MyLocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        stopLocationService();
 
     }
 
@@ -207,7 +208,7 @@ public class MyLocationService extends Service {
         }
         WeatherAPI service = retrofit.create(WeatherAPI.class);
         Call<WeatherModel> weatherCall = service.getWeather(cityName, Constans.API_KEY, Constans.METRIC);
-        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetIds);
+        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetId);
         weatherCall.enqueue(new Callback<WeatherModel>() {
             @Override
             public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
