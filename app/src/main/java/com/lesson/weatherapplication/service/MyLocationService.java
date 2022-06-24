@@ -34,12 +34,14 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.lesson.weatherapplication.R;
+import com.lesson.weatherapplication.activity.MainActivity;
 import com.lesson.weatherapplication.constans.Constans;
 import com.lesson.weatherapplication.constans.WidgetConstans;
 import com.lesson.weatherapplication.data.WeatherAPI;
 import com.lesson.weatherapplication.model.Weather;
 import com.lesson.weatherapplication.model.WeatherModel;
 import com.lesson.weatherapplication.util.PreferencesConstants;
+import com.lesson.weatherapplication.util.WidgetUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,8 +57,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MyLocationService extends Service {
     String cityName;
+    Context context;
+    AppWidgetManager appWidgetManager;
+    int[] appWidgetIds;
     private static Retrofit retrofit;
     private final IBinder binder = new LocalBinder();
+
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -69,10 +75,17 @@ public class MyLocationService extends Service {
 
                 cityName = getCityName(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
                 System.out.println("Current:" + cityName);
-                //dataRequest(views, appWidgetManager, context, appWidgetId, getCityNameFromPreferences(context));
 
+                for (int appWidgetId : appWidgetIds) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, WidgetUtils.getWithMutability());
 
+                    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+                    views.setOnClickPendingIntent(R.id.widget_Root, pendingIntent);
 
+                    dataRequest(views, appWidgetManager, context, appWidgetId, getCityNameFromPreferences(context));
+
+                }
             }
         }
     };
@@ -81,6 +94,19 @@ public class MyLocationService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        startLocationService();
+        context = this;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopLocationService();
     }
 
     private void startLocationService() {
@@ -139,16 +165,6 @@ public class MyLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            String action = intent.getAction();
-            if (action != null) {
-                if (action.equals(WidgetConstans.ACTION_START_LOCATION_SERVICE)) {
-                    startLocationService();
-                } else if (action.equals(WidgetConstans.ACTION_STOP_LOCATION_SERVICE)) {
-                    stopLocationService();
-                }
-            }
-        }
         return Service.START_STICKY;
     }
 
