@@ -8,6 +8,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +43,7 @@ import com.lesson.weatherapplication.model.Weather;
 import com.lesson.weatherapplication.model.WeatherModel;
 import com.lesson.weatherapplication.util.PreferencesConstants;
 import com.lesson.weatherapplication.util.WidgetUtils;
+import com.lesson.weatherapplication.widget.NewAppWidget;
 
 import java.io.IOException;
 import java.util.List;
@@ -106,7 +108,7 @@ public class MyLocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopLocationService();
+
     }
 
     private void startLocationService() {
@@ -205,7 +207,7 @@ public class MyLocationService extends Service {
         }
         WeatherAPI service = retrofit.create(WeatherAPI.class);
         Call<WeatherModel> weatherCall = service.getWeather(cityName, Constans.API_KEY, Constans.METRIC);
-        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetId);
+        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetIds);
         weatherCall.enqueue(new Callback<WeatherModel>() {
             @Override
             public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
