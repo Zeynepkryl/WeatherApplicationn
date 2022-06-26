@@ -1,4 +1,4 @@
-package com.lesson.weatherapplication.constans;
+package com.lesson.weatherapplication.common;
 
 public class Constans {
     public static String BASE_URL = "https://api.openweathermap.org/";

@@ -8,12 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.lesson.weatherapplication.constans.Constans;
-import com.lesson.weatherapplication.dailymodel.Daily;
-import com.lesson.weatherapplication.data.ApiClient;
+import com.lesson.weatherapplication.common.Constans;
+import com.lesson.weatherapplication.data.dailymodel.Daily;
+import com.lesson.weatherapplication.data.retrofit.ApiClient;
 import com.lesson.weatherapplication.data.WeatherAPI;
-import com.lesson.weatherapplication.model.WeatherModel;
-import com.lesson.weatherapplication.model.WeatherResponse;
+import com.lesson.weatherapplication.data.model.WeatherModel;
+import com.lesson.weatherapplication.data.model.WeatherResponse;
 
 import java.util.List;
 

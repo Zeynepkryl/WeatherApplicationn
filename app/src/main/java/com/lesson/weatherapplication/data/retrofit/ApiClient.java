@@ -1,6 +1,6 @@
-package com.lesson.weatherapplication.data;
+package com.lesson.weatherapplication.data.retrofit;
 
-import static com.lesson.weatherapplication.constans.Constans.BASE_URL;
+import static com.lesson.weatherapplication.common.Constans.BASE_URL;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

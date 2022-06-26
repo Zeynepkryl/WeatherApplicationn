@@ -1,4 +1,4 @@
-package com.lesson.weatherapplication.constans;
+package com.lesson.weatherapplication.common;
 
 public class WidgetConstans {
     public static final int LOCATION_SERVICE_ID = 175;

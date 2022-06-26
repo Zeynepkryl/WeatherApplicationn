@@ -1,4 +1,4 @@
-package com.lesson.weatherapplication.bootcomplete;
+package com.lesson.weatherapplication.broadcastreceiver.bootcomplete;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

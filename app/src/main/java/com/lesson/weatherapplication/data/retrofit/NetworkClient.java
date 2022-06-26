@@ -1,4 +1,4 @@
-package com.lesson.weatherapplication.data;
+package com.lesson.weatherapplication.data.retrofit;
 
 import java.util.concurrent.TimeUnit;
 

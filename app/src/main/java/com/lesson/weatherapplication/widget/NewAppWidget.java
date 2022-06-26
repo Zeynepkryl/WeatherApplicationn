@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.lesson.weatherapplication.R;
 
-import com.lesson.weatherapplication.constans.WidgetConstans;
+import com.lesson.weatherapplication.common.WidgetConstans;
 import com.lesson.weatherapplication.service.MyLocationService;
 
 

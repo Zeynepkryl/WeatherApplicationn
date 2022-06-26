@@ -1,7 +1,7 @@
-package com.lesson.weatherapplication.model;
+package com.lesson.weatherapplication.data.model;
 
 import com.google.gson.annotations.SerializedName;
-import com.lesson.weatherapplication.dailymodel.Daily;
+import com.lesson.weatherapplication.data.dailymodel.Daily;
 
 import java.util.List;
 

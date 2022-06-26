@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.lesson.weatherapplication.model.NetworkStatusEnum;
+import com.lesson.weatherapplication.data.model.NetworkStatusEnum;
 
 public class MyRecevier extends BroadcastReceiver {
     private final OnBroadcastReceiverReceivedListener listener;

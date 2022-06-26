@@ -1,6 +1,6 @@
 package com.lesson.weatherapplication.activity;
 
-import static com.lesson.weatherapplication.util.PreferencesConstants.CITY_NAME;
+import static com.lesson.weatherapplication.common.PreferencesConstants.CITY_NAME;
 import static cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory.TAG;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -51,12 +51,12 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 import com.lesson.weatherapplication.R;
-import com.lesson.weatherapplication.adapter.WeatherModelAdapter;
+import com.lesson.weatherapplication.activity.adapter.WeatherModelAdapter;
 
 import com.lesson.weatherapplication.broadcastreceiver.MyRecevier;
-import com.lesson.weatherapplication.dailymodel.Daily;
+import com.lesson.weatherapplication.data.dailymodel.Daily;
 import com.lesson.weatherapplication.databinding.ActivityMainBinding;
-import com.lesson.weatherapplication.model.NetworkStatusEnum;
+import com.lesson.weatherapplication.data.model.NetworkStatusEnum;
 import com.lesson.weatherapplication.service.MyLocationService;
 import com.lesson.weatherapplication.viewmodel.WeatherViewModel;
 import com.lesson.weatherapplication.widget.NewAppWidget;

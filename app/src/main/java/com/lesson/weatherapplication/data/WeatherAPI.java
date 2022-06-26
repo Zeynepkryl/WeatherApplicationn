@@ -1,7 +1,7 @@
 package com.lesson.weatherapplication.data;
 
-import com.lesson.weatherapplication.model.WeatherModel;
-import com.lesson.weatherapplication.model.WeatherResponse;
+import com.lesson.weatherapplication.data.model.WeatherModel;
+import com.lesson.weatherapplication.data.model.WeatherResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

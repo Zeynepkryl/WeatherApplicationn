@@ -1,4 +1,4 @@
-package com.lesson.weatherapplication.util;
+package com.lesson.weatherapplication.common.util;
 
 import static android.app.PendingIntent.FLAG_MUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
