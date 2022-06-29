@@ -57,12 +57,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MyLocationService extends Service {
     String cityName;
-    Context context;
-    AppWidgetManager appWidgetManager;
-    int[] appWidgetIds;
-    private static Retrofit retrofit;
     private final IBinder binder = new LocalBinder();
-
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -76,16 +71,6 @@ public class MyLocationService extends Service {
                 cityName = getCityName(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
                 System.out.println("Current:" + cityName);
 
-                for (int appWidgetId : appWidgetIds) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, WidgetUtils.getWithMutability());
-
-                    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-                    views.setOnClickPendingIntent(R.id.widget_Root, pendingIntent);
-
-                    dataRequest(views, appWidgetManager, context, appWidgetId, getCityNameFromPreferences(context));
-
-                }
             }
         }
     };
@@ -94,20 +79,6 @@ public class MyLocationService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        startLocationService();
-        context = this;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopLocationService();
-
     }
 
     private void startLocationService() {
@@ -166,6 +137,16 @@ public class MyLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            String action = intent.getAction();
+            if (action != null) {
+                if (action.equals(WidgetConstans.ACTION_START_LOCATION_SERVICE)) {
+                    startLocationService();
+                } else if (action.equals(WidgetConstans.ACTION_STOP_LOCATION_SERVICE)) {
+                    stopLocationService();
+                }
+            }
+        }
         return Service.START_STICKY;
     }
 
@@ -190,55 +171,6 @@ public class MyLocationService extends Service {
             e.printStackTrace();
         }
         return cityName;
-    }
-
-    private void dataRequest(RemoteViews views, AppWidgetManager appWidgetManager, Context context, int appWidgetId, String cityName) {
-        if (retrofit == null) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-            httpClient.addInterceptor(logging);
-
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(httpClient.build())
-                    .build();
-        }
-        WeatherAPI service = retrofit.create(WeatherAPI.class);
-        Call<WeatherModel> weatherCall = service.getWeather(cityName, Constans.API_KEY, Constans.METRIC);
-        AppWidgetTarget weatherIcon = new AppWidgetTarget(context, R.id.widgetCondition, views, appWidgetId);
-        weatherCall.enqueue(new Callback<WeatherModel>() {
-            @Override
-            public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    Weather todayWeather = response.body().getTodayWeather();
-                    views.setTextViewText(R.id.widgetDescription, response.body().getWeather().get(0).getDescription());
-                    views.setTextViewText(R.id.widgetminTemp, ((int) response.body().getMain().getTempMin().doubleValue() + "°"));
-                    views.setTextViewText(R.id.widgetmaxTemp, ((int) response.body().getMain().getTempMax().doubleValue() + "°"));
-                    views.setTextViewText(R.id.widgetTemp, ((int) response.body().getMain().getTemp().doubleValue() + "°"));
-                    views.setTextViewText(R.id.widgetcityText, response.body().getName());
-
-                    Glide.with(context.getApplicationContext())
-                            .asBitmap()
-                            .load(todayWeather.getIconUrl())
-                            .into(weatherIcon);
-                }
-                appWidgetManager.updateAppWidget(appWidgetId, views);
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<WeatherModel> call, @NonNull Throwable t) {
-
-            }
-        });
-    }
-
-    private String getCityNameFromPreferences(Context context) {
-        String defaultCityName = "Ankara";
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PreferencesConstants.PREFERENCES_NAME, MODE_PRIVATE);
-        return sharedPreferences.getString(PreferencesConstants.CITY_NAME, defaultCityName);
     }
 
     public class LocalBinder extends Binder {
