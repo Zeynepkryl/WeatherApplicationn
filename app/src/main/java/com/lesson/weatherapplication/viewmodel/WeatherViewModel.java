@@ -2,72 +2,40 @@ package com.lesson.weatherapplication.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
+
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
 
-import com.lesson.weatherapplication.common.Constans;
 import com.lesson.weatherapplication.data.dailymodel.Daily;
-import com.lesson.weatherapplication.data.retrofit.ApiClient;
-import com.lesson.weatherapplication.data.WeatherAPI;
 import com.lesson.weatherapplication.data.model.WeatherModel;
-import com.lesson.weatherapplication.data.model.WeatherResponse;
+import com.lesson.weatherapplication.service.DataManager;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class WeatherViewModel extends AndroidViewModel {
-
     Context context;
+    DataManager dataManager = new DataManager();
+    private LiveData<WeatherModel> weatherModel;
+    private LiveData<List<Daily>> dailyWeather;
 
-    private MutableLiveData<WeatherModel> weatherModel;
-    private MutableLiveData<List<Daily>> dailyWeather;
-
-    public WeatherViewModel(Application context) {
-        super(context);
+    public WeatherViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public MutableLiveData<WeatherModel> getWeatherData(String city) {
-
-        weatherModel = new MutableLiveData<>();
-
-        WeatherAPI weatherAPI = ApiClient.createApiClient().create(WeatherAPI.class);
-        weatherAPI.getWeather(city, Constans.API_KEY, Constans.METRIC).enqueue(new Callback<WeatherModel>() {
-            @Override
-            public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
-                if (response.isSuccessful())
-                    weatherModel.setValue(response.body());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<WeatherModel> call, @NonNull Throwable t) {
-
-            }
-        });
-        return weatherModel;
-    }
-
-    public MutableLiveData<List<Daily>> getDaily() {
-        dailyWeather = new MutableLiveData<>();
-        WeatherAPI weatherAPI = ApiClient.createApiClient().create(WeatherAPI.class);
-        weatherAPI.getDaily("0", "10", "10", Constans.API_KEY, "metric").enqueue(new Callback<WeatherResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
-                Log.e("Response", response.body().toString());
-                if (response.body() != null && response.isSuccessful())
-                    dailyWeather.postValue(response.body().daily);
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
-            }
-        });
+    public LiveData<List<Daily>> getDaily() {
+        LiveData<List<Daily>> data = dataManager.getDaily();
+        if (data != null)
+            dailyWeather = data;
         return dailyWeather;
+    }
+
+    public LiveData<WeatherModel> getWeatherData(String city) {
+        LiveData<WeatherModel> weather = dataManager.getWeatherData(city);
+        if (weather != null)
+            weatherModel = weather;
+        return weatherModel;
     }
 }

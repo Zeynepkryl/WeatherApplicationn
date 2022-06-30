@@ -44,8 +44,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NewAppWidget extends AppWidgetProvider {
 
     private static Retrofit retrofit;
-    Runnable runnable;
-    Handler handler;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -110,7 +108,6 @@ public class NewAppWidget extends AppWidgetProvider {
             @Override
             public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
                 if (response.isSuccessful()) {
-                    runnable = () -> {
                         assert response.body() != null;
                         Weather todayWeather = response.body().getTodayWeather();
                         views.setTextViewText(R.id.widgetDescription, response.body().getWeather().get(0).getDescription());
@@ -123,10 +120,6 @@ public class NewAppWidget extends AppWidgetProvider {
                                 .asBitmap()
                                 .load(todayWeather.getIconUrl())
                                 .into(weatherIcon);
-                        handler.postDelayed(runnable, 2000);
-                    };
-                    handler = new Handler();
-                    handler.post(runnable);
                 }
                 appWidgetManager.updateAppWidget(appWidgetId, views);
             }
@@ -140,7 +133,6 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         startLocationService(context);
-        handler = new Handler();
     }
 
     @Override
