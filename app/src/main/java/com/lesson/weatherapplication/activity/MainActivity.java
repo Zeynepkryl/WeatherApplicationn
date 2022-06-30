@@ -185,21 +185,23 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void inWeatherDataCall() {
         viewModel.getWeatherData(cityName).observe(MainActivity.this, weatherModel -> {
-            binding.cityText.setText(weatherModel.getName() + " | " + weatherModel.getSys().getCountry());
-            binding.tempText.setText((int) weatherModel.getMain().getTemp().doubleValue() + "°");
-            binding.windText.setText(String.valueOf(weatherModel.getWind().getSpeed() + " km/h"));
-            binding.humidityText.setText(String.valueOf(weatherModel.getMain().getHumidity() + " %"));
-            binding.visibilityText.setText(String.valueOf(weatherModel.getVisibility() + " m"));
-            binding.pressureText.setText(String.valueOf(weatherModel.getMain().getPressure() + " hPa"));
-            binding.feelsText.setText((int) weatherModel.getMain().getFeelsLike().doubleValue() + "°");
-            binding.descriptionText.setText(String.valueOf(weatherModel.getWind().getSpeed()));
-            binding.conditionText.setText(String.valueOf(weatherModel.getWeather().get(0).getDescription()));
+            if (weatherModel != null && weatherModel.getWeather() != null) {
+                binding.cityText.setText(weatherModel.getName() + " | " + weatherModel.getSys().getCountry());
+                binding.tempText.setText((int) weatherModel.getMain().getTemp().doubleValue() + "°");
+                binding.windText.setText(String.valueOf(weatherModel.getWind().getSpeed() + " km/h"));
+                binding.humidityText.setText(String.valueOf(weatherModel.getMain().getHumidity() + " %"));
+                binding.visibilityText.setText(String.valueOf(weatherModel.getVisibility() + " m"));
+                binding.pressureText.setText(String.valueOf(weatherModel.getMain().getPressure() + " hPa"));
+                binding.feelsText.setText((int) weatherModel.getMain().getFeelsLike().doubleValue() + "°");
+                binding.descriptionText.setText(String.valueOf(weatherModel.getWind().getSpeed()));
+                binding.conditionText.setText(String.valueOf(weatherModel.getWeather().get(0).getDescription()));
 
-            Glide.with(this)
-                    .load("http://openweathermap.org/img/w/" + weatherModel.getWeather().get(0).getIcon() + ".png")
-                    .into(binding.idIVIcon);
+                Glide.with(this)
+                        .load("http://openweathermap.org/img/w/" + weatherModel.getWeather().get(0).getIcon() + ".png")
+                        .into(binding.idIVIcon);
 
-            getWeatherData(updateTime);
+                getWeatherData(updateTime);
+            }
         });
     }
 
@@ -208,19 +210,22 @@ public class MainActivity extends AppCompatActivity {
 
         handler.removeCallbacks(runnable);
         runnable = () -> viewModel.getWeatherData(cityName).observe(MainActivity.this, weatherModel -> {
-            binding.cityText.setText(weatherModel.getName() + " | " + weatherModel.getSys().getCountry());
-            binding.tempText.setText((int) weatherModel.getMain().getTemp().doubleValue() + "°");
-            binding.windText.setText(String.valueOf(weatherModel.getWind().getSpeed() + " km/h"));
-            binding.humidityText.setText(String.valueOf(weatherModel.getMain().getHumidity() + " %"));
-            binding.visibilityText.setText(String.valueOf(weatherModel.getVisibility() + " m"));
-            binding.pressureText.setText(String.valueOf(weatherModel.getMain().getPressure() + " hPa"));
-            binding.feelsText.setText((int) weatherModel.getMain().getFeelsLike().doubleValue() + "°");
-            binding.descriptionText.setText(String.valueOf(weatherModel.getWind().getSpeed()));
-            binding.conditionText.setText(String.valueOf(weatherModel.getWeather().get(0).getDescription()));
-            handler.postDelayed(runnable, updateTime);
+            if (weatherModel != null && weatherModel.getWeather() != null) {
+                binding.cityText.setText(weatherModel.getName() + " | " + weatherModel.getSys().getCountry());
+                binding.tempText.setText((int) weatherModel.getMain().getTemp().doubleValue() + "°");
+                binding.windText.setText(String.valueOf(weatherModel.getWind().getSpeed() + " km/h"));
+                binding.humidityText.setText(String.valueOf(weatherModel.getMain().getHumidity() + " %"));
+                binding.visibilityText.setText(String.valueOf(weatherModel.getVisibility() + " m"));
+                binding.pressureText.setText(String.valueOf(weatherModel.getMain().getPressure() + " hPa"));
+                binding.feelsText.setText((int) weatherModel.getMain().getFeelsLike().doubleValue() + "°");
+                binding.descriptionText.setText(String.valueOf(weatherModel.getWind().getSpeed()));
+                binding.conditionText.setText(String.valueOf(weatherModel.getWeather().get(0).getDescription()));
+                handler.postDelayed(runnable, updateTime);
+            }
         });
         handler.postDelayed(runnable, updateTime);
     }
+
 
     private void getWeather() {
 
