@@ -71,7 +71,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     private boolean isBound = false;
     private MyLocationService service;
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MyLocationService.LocalBinder binder = (MyLocationService.LocalBinder) iBinder;
