@@ -49,13 +49,24 @@
                 android:id="@+id/temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="43dp"
+                android:layout_marginTop="53dp"
+                android:textColor="#000000"
+                android:textSize="11dp"
+                android:textStyle="bold"
+                tools:text="23" />
+
+            <TextView
+                android:id="@+id/desciription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/idIVCondition"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
                 android:textColor="#000000"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                tools:text="23°" />
+                tools:text="Clear sky" />
 
             <LinearLayout
                 android:layout_width="match_parent"

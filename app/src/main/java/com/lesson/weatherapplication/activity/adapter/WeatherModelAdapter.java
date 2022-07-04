@@ -38,7 +38,8 @@ public class WeatherModelAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         ((WeatherViewHolder) holder).binding.maxTempTextView.setText((int) weatherItem.getTemp().getMax().doubleValue() + "°");
         ((WeatherViewHolder) holder).binding.minTempTextView.setText((int) weatherItem.getTemp().getMin().doubleValue() + "°");
-        ((WeatherViewHolder) holder).binding.temp.setText(String.valueOf(weatherItem.getWeather().get(0).getDescription()));
+        ((WeatherViewHolder) holder).binding.desciription.setText(String.valueOf(weatherItem.getWeather().get(0).getDescription()));
+        ((WeatherViewHolder) holder).binding.temp.setText((int) weatherItem.getTemp().getMorn().doubleValue() + "°");
 
         Glide.with(context)
                 .load("http://openweathermap.org/img/w/" + weatherItem.getWeather().get(0).getIcon() + ".png")
