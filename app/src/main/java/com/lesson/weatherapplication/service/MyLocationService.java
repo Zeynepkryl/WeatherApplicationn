@@ -1,16 +1,16 @@
 package com.lesson.weatherapplication.service;
 
-import static com.lesson.weatherapplication.common.Constans.BASE_URL;
+
 
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -19,7 +19,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.RemoteViews;
+
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,33 +27,19 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.AppWidgetTarget;
+
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.lesson.weatherapplication.R;
-import com.lesson.weatherapplication.activity.MainActivity;
-import com.lesson.weatherapplication.common.Constans;
+
 import com.lesson.weatherapplication.common.WidgetConstans;
-import com.lesson.weatherapplication.data.WeatherAPI;
-import com.lesson.weatherapplication.data.model.Weather;
-import com.lesson.weatherapplication.data.model.WeatherModel;
-import com.lesson.weatherapplication.common.PreferencesConstants;
-import com.lesson.weatherapplication.common.util.WidgetUtils;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class MyLocationService extends Service {
     String cityName;
