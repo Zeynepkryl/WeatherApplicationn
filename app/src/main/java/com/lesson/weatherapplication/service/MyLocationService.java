@@ -2,18 +2,25 @@ package com.lesson.weatherapplication.service;
 
 
 
+import static com.lesson.weatherapplication.common.PreferencesConstants.CITY_NAME;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -34,6 +41,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import com.lesson.weatherapplication.common.WidgetConstans;
+import com.lesson.weatherapplication.widget.NewAppWidget;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,7 +51,11 @@ import java.util.Locale;
 
 public class MyLocationService extends Service {
     String cityName;
+    private ServiceListener listener;
+
     private final IBinder binder = new LocalBinder();
+
+
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -55,6 +67,18 @@ public class MyLocationService extends Service {
                 Log.d("LOCATION_UPDATE", latitude + ", " + longitude);
 
                 cityName = getCityName(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
+
+                if (listener != null)
+                    listener.onCityNameFetched(cityName);
+
+                SharedPreferences sharedPreferences = getSharedPreferences("com.lesson.weatherapp.Activity", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(CITY_NAME, cityName);
+                editor.apply();
+
+                triggerWidgetOnUpdate();
+
+
                 System.out.println("Current:" + cityName);
 
             }
@@ -75,7 +99,7 @@ public class MyLocationService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 getApplicationContext(), 0,
                 resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getApplicationContext(),
@@ -109,6 +133,7 @@ public class MyLocationService extends Service {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
         LocationServices.getFusedLocationProviderClient(this)
                 .requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
         startForeground(WidgetConstans.LOCATION_SERVICE_ID, builder.build());
@@ -134,6 +159,10 @@ public class MyLocationService extends Service {
             }
         }
         return Service.START_STICKY;
+    }
+
+    public void setListener(ServiceListener listener){
+        this.listener = listener;
     }
 
     private String getCityName(double latitude, double longitude) {
@@ -164,4 +193,22 @@ public class MyLocationService extends Service {
             return MyLocationService.this;
         }
     }
+
+    public interface ServiceListener{
+        void onCityNameFetched(String cityName);
+    }
+
+    private void triggerWidgetOnUpdate() {
+
+        Intent intent = new Intent(this, NewAppWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+
+        int[] ids = AppWidgetManager.getInstance(getApplication())
+                .getAppWidgetIds(new ComponentName(getApplication(), NewAppWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+
+        sendBroadcast(intent);
+    }
+
 }
+
