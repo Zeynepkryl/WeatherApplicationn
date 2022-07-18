@@ -1,39 +1,35 @@
 package com.lesson.weatherapplication.activity;
 
-import static com.lesson.weatherapplication.common.PreferencesConstants.CITY_NAME;
+
 import static cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory.TAG;
 
-import androidx.activity.result.ActivityResultCallback;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.appwidget.AppWidgetManager;
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
+
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -41,15 +37,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
+
 import com.google.android.gms.location.LocationServices;
-import com.google.android.material.snackbar.Snackbar;
+
 import com.lesson.weatherapplication.R;
 import com.lesson.weatherapplication.activity.adapter.WeatherModelAdapter;
 
@@ -60,9 +54,7 @@ import com.lesson.weatherapplication.databinding.ActivityMainBinding;
 import com.lesson.weatherapplication.data.model.NetworkStatusEnum;
 import com.lesson.weatherapplication.service.MyLocationService;
 import com.lesson.weatherapplication.viewmodel.WeatherViewModel;
-import com.lesson.weatherapplication.widget.NewAppWidget;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,14 +71,9 @@ public class MainActivity extends AppCompatActivity {
             MyLocationService.LocalBinder binder = (MyLocationService.LocalBinder) iBinder;
             service = binder.getService();
             service.setListener(cityName -> {
+                mCityName = cityName;
                 if (!isInitialized){
-                    mCityName = cityName;
                     inWeatherDataCall();
-                }else{
-                    if(!mCityName.equals(cityName)){
-                        mCityName = cityName;
-                        inWeatherDataCall();
-                    }
                 }
             });
             isBound = true;
