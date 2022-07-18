@@ -1,7 +1,6 @@
 package com.lesson.weatherapplication.service;
 
 
-
 import static com.lesson.weatherapplication.common.PreferencesConstants.CITY_NAME;
 
 import android.Manifest;
@@ -32,6 +31,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 
 import com.google.android.gms.location.LocationCallback;
@@ -39,22 +40,30 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import com.lesson.weatherapplication.common.Constans;
 import com.lesson.weatherapplication.common.WidgetConstans;
+import com.lesson.weatherapplication.data.WeatherAPI;
+import com.lesson.weatherapplication.data.dailymodel.Daily;
+import com.lesson.weatherapplication.data.model.WeatherModel;
+import com.lesson.weatherapplication.data.model.WeatherResponse;
+import com.lesson.weatherapplication.data.retrofit.ApiClient;
 import com.lesson.weatherapplication.widget.NewAppWidget;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyLocationService extends Service {
     String cityName;
     private ServiceListener listener;
+    WeatherAPI weatherAPI = ApiClient.createApiClient().create(WeatherAPI.class);
 
     private final IBinder binder = new LocalBinder();
-
-
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -160,7 +169,7 @@ public class MyLocationService extends Service {
         return Service.START_STICKY;
     }
 
-    public void setListener(ServiceListener listener){
+    public void setListener(ServiceListener listener) {
         this.listener = listener;
     }
 
@@ -193,7 +202,7 @@ public class MyLocationService extends Service {
         }
     }
 
-    public interface ServiceListener{
+    public interface ServiceListener {
         void onCityNameFetched(String cityName);
     }
 
@@ -207,6 +216,40 @@ public class MyLocationService extends Service {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 
         sendBroadcast(intent);
+    }
+
+    public LiveData<WeatherModel> getWeatherData(String city) {
+        final MutableLiveData<WeatherModel> data = new MutableLiveData<>();
+        weatherAPI.getWeather(city, Constans.API_KEY, Constans.METRIC).enqueue(new Callback<WeatherModel>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherModel> call, @NonNull Response<WeatherModel> response) {
+                if (response.isSuccessful())
+                    data.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<WeatherModel> call, @NonNull Throwable t) {
+                data.setValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<List<Daily>> getDaily() {
+        final MutableLiveData<List<Daily>> data = new MutableLiveData<>();
+        weatherAPI.getDaily("0", "10", "10", Constans.API_KEY, "metric").enqueue(new Callback<WeatherResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+                if (response.body() != null && response.isSuccessful())
+                    data.setValue(response.body().daily);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+        return data;
     }
 
 }

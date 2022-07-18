@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             service = binder.getService();
             service.setListener(cityName -> {
                 mCityName = cityName;
-                if (!isInitialized){
+                if (!isInitialized) {
                     inWeatherDataCall();
                 }
             });
@@ -205,9 +205,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void getWeatherData(long updateTime) {
-
         handler.removeCallbacks(runnable);
-        runnable = () -> viewModel.getWeatherData(mCityName).observe(MainActivity.this, weatherModel -> {
+        runnable = () -> service.getWeatherData(mCityName).observe(MainActivity.this, weatherModel -> {
             if (weatherModel != null && weatherModel.getWeather() != null) {
                 binding.cityText.setText(weatherModel.getName() + " | " + weatherModel.getSys().getCountry());
                 binding.tempText.setText((int) weatherModel.getMain().getTemp().doubleValue() + "°");
